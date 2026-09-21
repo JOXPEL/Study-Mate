@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>قائمة الكورسات المتاحة</h2>
+{% if courses %}
+<div style="display: flex; gap: 15px; flex-wrap: wrap;">
+    {% for course in courses %}
+    <div style="border: 1px solid #ccc; padding: 15px; border-radius: 8px;">
+        <h3>{{ course.title }}</h3>
+        <p>{{ course.description }}</p>
+        <p><small>المحاضر: {{ course.instructor.username }}</small></p>
+        <a href="{% url 'courses:detail' course.id %}">عرض تفاصيل الكورس</a>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>لا توجد كورسات متاحة حالياً.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>أهلاً بك، {{ user.username }}!</h1>
+<p>دورك في النظام: {{ user.role }}</p>
+
+<hr>
+
+<h3>آخر محاولات الكويزات (Quiz Attempts)</h3>
+{% if attempts %}
+<ul>
+    {% for attempt in attempts %}
+    <li>
+        الكويز: {{ attempt.quiz.title }} -
+        الدرجة: {{ attempt.score }}/{{ attempt.total_questions }} -
+        التاريخ: {{ attempt.completed_at|date:"Y-m-d H:i" }}
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>لم تقم بأي كويز حتى الآن.</p>
+{% endif %}
+
+<hr>
+
+<h3>خطط المذاكرة الخاصة بك (Study Plans)</h3>
+{% if plans %}
+<ul>
+    {% for plan in plans %}
+    <li>
+        <strong>{{ plan.title }}</strong> (تاريخ البداية: {{ plan.start_date }})
+        <ul>
+            {% for item in plan.items.all %}
+            <li>اليوم {{ item.day_number }}: {{ item.module.title }} - {% if item.completed %}مكتمل ✅{% else %}غير مكتمل
+                ❌{% endif %}</li>
+            {% endfor %}
+        </ul>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>لا توجد خطط مذاكرة حالياً. (يمكن للـ AI إنشاؤها لك لاحقاً!)</p>
+{% endif %}
+{% endblock %}

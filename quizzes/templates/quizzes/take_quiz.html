@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>اختبار: {{ quiz.title }}</h2>
+<p>الوحدة: {{ quiz.module.title }}</p>
+
+<form method="post">
+    {% csrf_token %}
+    {% for q in questions %}
+    <div style="margin-bottom: 20px; border-bottom: 1px solid #ddd; padding-bottom: 10px;">
+        <p><strong>س{{ forloop.counter }}: {{ q.question_text }}</strong></p>
+
+        <label><input type="radio" name="question_{{ q.id }}" value="A" required> A) {{ q.option_a }}</label><br>
+        <label><input type="radio" name="question_{{ q.id }}" value="B"> B) {{ q.option_b }}</label><br>
+        <label><input type="radio" name="question_{{ q.id }}" value="C"> C) {{ q.option_c }}</label><br>
+        <label><input type="radio" name="question_{{ q.id }}" value="D"> D) {{ q.option_d }}</label>
+    </div>
+    {% endfor %}
+
+    <button type="submit">إنهاء وتكليف النتيجة</button>
+</form>
+{% endblock %}

@@ -7,6 +7,7 @@ urlpatterns = [
     path('courses/', include('courses.urls')),
     path('quizzes/', include('quizzes.urls')),
     path('', include('dashboard.urls')),
+    path('ai-agent/', include('ai_agent.urls')),
     
 ]
 

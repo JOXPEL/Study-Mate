@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>{{ course.title }}</h2>
+<p>{{ course.description }}</p>
+<hr>
+<h3>وحدات الكورس (Modules)</h3>
+{% if modules %}
+<ol>
+    {% for module in modules %}
+    <li>
+        <strong>{{ module.title }}</strong>
+        <p>{{ module.description }}</p>
+
+        <!-- عرض الكويزات الخاصة بهذا الـ Module -->
+        {% if module.quizzes.all %}
+        <ul>
+            {% for quiz in module.quizzes.all %}
+            <li>
+                {{ quiz.title }} -
+                <a href="{% url 'quizzes:take' quiz.id %}">ابدأ الكويز الان</a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </li>
+    {% endfor %}
+</ol>
+{% else %}
+<p>لا توجد وحدات في هذا الكورس بعد.</p>
+{% endif %}
+<a href="{% url 'courses:list' %}">← العودة لقائمة الكورسات</a>
+{% endblock %}
