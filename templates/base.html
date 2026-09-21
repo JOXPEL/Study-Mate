@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}StudyMate - منصة التعلم الذكي{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-light d-flex flex-column min-vh-100">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="{% url 'dashboard:home' %}">🎓 StudyMate</a>
+
+            <div class="d-flex align-items-center">
+                {% if user.is_authenticated %}
+                <span class="text-light me-3">مرحباً، <strong>{{ user.username }}</strong>
+                    ({{ user.get_role_display|default:user.role }})</span>
+                <a href="{% url 'courses:list' %}" class="btn btn-outline-light btn-sm me-2">الكورسات</a>
+                <a href="{% url 'accounts:logout' %}" class="btn btn-danger btn-sm">تسجيل الخروج</a>
+                {% else %}
+                <a href="{% url 'accounts:login' %}" class="btn btn-outline-light btn-sm me-2">دخول</a>
+                <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-sm">حساب جديد</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <main class="container flex-grow-1">
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="bg-white text-center text-muted py-3 mt-4 border-top">
+        <small>جميع الحقوق محفوظة &copy; 2026 - StudyMate E-Learning Platform</small>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+    <!-- Chat Floating Widget (لزميلك يصممه) -->
+    <div id="ai-chat-box"
+        style="position: fixed; bottom: 20px; right: 20px; background: white; border: 1px solid #ccc; padding: 15px; width: 320px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <h6>🤖 StudyMate Agent</h6>
+        <div id="chat-logs"
+            style="height: 150px; overflow-y: auto; font-size: 13px; border-bottom: 1px solid #eee; margin-bottom: 10px;">
+        </div>
+        <div class="input-group">
+            <input type="text" id="chat-message" class="form-control form-control-sm" placeholder="اطلب خطة مذاكرة...">
+            <button id="send-btn" class="btn btn-primary btn-sm" onclick="sendMessage()">إرسال</button>
+        </div>
+    </div>
+
+    <script>
+        function sendMessage() {
+            const input = document.getElementById('chat-message');
+            const logs = document.getElementById('chat-logs');
+            const message = input.value;
+            if (!message) return;
+
+            logs.innerHTML += `<div><b>أنت:</b> ${message}</div>`;
+            input.value = '';
+
+            const formData = new FormData();
+            formData.append('message', message);
+            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+            fetch("{% url 'ai_agent:chat_api' %}", {
+                method: 'POST',
+                body: formData
+            })
+                .then(res => res.json())
+                .then(data => {
+                    logs.innerHTML += `<div style="color: green;"><b>الـ AI:</b> ${data.response}</div>`;
+                    logs.scrollTop = logs.scrollHeight;
+                });
+        }
+    </script>
+</body>
+
+</html>

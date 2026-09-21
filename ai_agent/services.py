@@ -1,5 +1,4 @@
 import os
-import json
 from google import genai
 from google.genai import types
 from .tools import create_study_plan_tool, analyze_student_weaknesses
@@ -45,7 +44,7 @@ def run_study_mate_agent(user, user_message):
     tools = [get_agent_tools_declaration()]
     
     response = client.models.generate_content(
-        model="gemin-3.6-flash",
+        model="gemini-3.6-flash",
         contents=user_message,
         config=types.GenerateContentConfig(
             system_instruction=system_instruction,
@@ -53,7 +52,7 @@ def run_study_mate_agent(user, user_message):
             temperature=0.2
         )
     )
-###########################################
+#__________________________________________________________
     if response.function_calls:
         for call in response.function_calls:
             if call.name == "create_study_plan_tool":
