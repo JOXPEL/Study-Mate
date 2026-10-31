@@ -62,7 +62,10 @@ def run_study_mate_agent(user, user_message):
                     plan_title=args.get("plan_title", "Custom Study Plan"),
                     duration_days=int(args.get("duration_days", 3))
                 )
-                
-                return f"✅Study plan created successfully in the database!\n\n📋 **Study title:** {result['plan_title']}\n📅 **Lessons**\n" + "\n".join([f"- {item}" for item in result['assigned_modules']])
+
+                if result["status"] != "success":
+                    return result["message"]
+
+                return f"✅ Study plan created!\n\n📋 **Study title:** {result['plan_title']}\n📅 **Lessons**\n" + "\n".join([f"- {item}" for item in result['assigned_modules']])
 
     return response.text

@@ -9,6 +9,7 @@ class Course(models.Model):
         on_delete=models.CASCADE,
         related_name='courses_taught'
     )
+    image = models.ImageField(upload_to='course_images/', default='course_images/default_course.jpg', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

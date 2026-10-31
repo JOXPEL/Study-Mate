@@ -12,3 +12,7 @@ def dashboard_home(request):
         'plans': plans
     }
     return render(request, 'dashboard/home.html', context)
+
+def home_view(request):
+    # صفحة الهوم الرئيسية (Landing Page)
+    return render(request, 'home.html')

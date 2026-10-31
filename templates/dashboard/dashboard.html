@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="p-4 bg-white rounded-3 shadow-sm border-start border-primary border-4">
+            <h2 class="fw-bold">Hello {{ user.username }} 👋</h2>
+            <p class="text-muted mb-0">This is your dashboard to monitor your academic performance and smart study plans</p>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- قسم الكويزات القديمة -->
+    <div class="col-md-6">
+        <div class="card h-100 shadow-sm">
+            <div class="card-header bg-white fw-bold py-3">
+                <i class="fa-solid fa-chart-line text-primary me-2"></i>Last quizzes results
+            </div>
+            <div class="card-body">
+                {% if attempts %}
+                <div class="list-group list-group-flush">
+                    {% for attempt in attempts %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <div>
+                            <h6 class="mb-0 fw-bold">{{ attempt.quiz.title }}</h6>
+                            <small class="text-muted">{{ attempt.completed_at|date:"Y-m-d H:i" }}</small>
+                        </div>
+                        <span class="badge bg-primary rounded-pill fs-6">
+                            {{ attempt.score }} / {{ attempt.total_questions }}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted text-center my-4">You haven't made any quiz yet</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- قسم خطط المذاكرة المولدة بالذكاء الاصطناعي -->
+    <div class="col-md-6">
+        <div class="card h-100 shadow-sm">
+            <div class="card-header bg-white fw-bold py-3">
+                <i class="fa-solid fa-wand-magic-sparkles text-purple me-2"></i>(AI Study Plans)
+            </div>
+            <div class="card-body">
+                {% if plans %}
+                {% for plan in plans %}
+                <div class="border rounded p-3 mb-3 bg-light">
+                    <h6 class="fw-bold text-primary mb-2">
+                        <i class="fa-solid fa-calendar-check me-2"></i>{{ plan.title }}
+                    </h6>
+
+                    <ul class="list-unstyled mb-0 small">
+                        {% for item in plan.items.all %}
+                        <li class="py-1">
+                            <i class="fa-solid fa-circle-dot text-secondary me-2"></i>
+                            <strong>Day{{ item.day_number }}:</strong> 
+                            <a href="/courses/{{ item.module.course.id }}/" class="text-decoration-none fw-bold">
+                                {{ item.module.title }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="text-center my-4">
+                    <p class="text-muted mb-2">There's no plans yet</p>
+                    <small class="text-primary">You have the access to ask the chat-bot to make a specified study plan</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Floating AI Chat Widget (للمستخدمين المسجلين فقط) -->
+{% if user.is_authenticated %}
+<div id="ai-chat-card" class="card shadow-lg mt-4">
+    <div class="card-header chat-header d-flex justify-content-between align-items-center py-2">
+        <span class="fw-bold"><i class="fa-solid fa-robot me-2"></i>StudyMate Agent</span>
+        <button class="btn btn-sm text-white" type="button" data-bs-toggle="collapse" data-bs-target="#chatBody">
+            <i class="fa-solid fa-chevron-down"></i>
+        </button>
+    </div>
+    <div id="chatBody" class="collapse show">
+        <div class="card-body p-2">
+            <div id="chat-logs" style="height: 220px; overflow-y: auto;">
+                <div class="chat-bubble-ai">أهلاً بك يا {{ user.username }}، كيف يمكنني مساعدتك اليوم؟</div>
+            </div>
+        </div>
+        <div class="card-footer bg-white border-top-0 p-2">
+            <div class="input-group">
+                <input type="text" id="chat-message" class="form-control form-control-sm"
+                    placeholder="اطلب خطة مذاكرة..." onkeypress="handleKeyPress(event)">
+                <button class="btn btn-primary btn-sm" onclick="sendMessage()">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function handleKeyPress(e) {
+        if (e.key === 'Enter') sendMessage();
+    }
+
+    function sendMessage() {
+        const input = document.getElementById('chat-message');
+        const logs = document.getElementById('chat-logs');
+        const message = input.value.trim();
+        if (!message) return;
+
+        // Render User Message
+        logs.innerHTML += `<div class="chat-bubble-user">${message}</div>`;
+        input.value = '';
+        logs.scrollTop = logs.scrollHeight;
+
+        const formData = new FormData();
+        formData.append('message', message);
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+        // استخدام المسار المباشر لضمان عدم حدوث خطأ في الـ Template Tags
+        fetch('/ai-agent/chat/', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            // Render AI Response
+            logs.innerHTML += `<div class="chat-bubble-ai">${data.response.replace(/\n/g, '<br>')}</div>`;
+            logs.scrollTop = logs.scrollHeight;
+        })
+        .catch(err => {
+            logs.innerHTML += `<div class="chat-bubble-ai text-danger">حدث خطأ في الاتصال بالسيرفر</div>`;
+            logs.scrollTop = logs.scrollHeight;
+        });
+    }
+</script>
+{% endif %}
+
+{% endblock %}

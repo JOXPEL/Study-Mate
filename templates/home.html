@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row align-items-center py-5">
+        <div class="col-lg-6 text-start">
+            <span class="badge bg-primary-subtle text-primary mb-3 px-3 py-2 rounded-pill fw-bold">
+                🎓 المنصة الذكية للتعلم
+            </span>
+            <h1 class="display-4 fw-bold text-dark mb-3">
+                أهلاً بك في منصة <span class="text-primary">StudyMate</span>
+            </h1>
+            <p class="lead text-muted mb-4">
+                منصتك التعليمية التفاعلية المدعومة بالذكاء الاصطناعي لإنشاء خطط مذاكرة مخصصة ومتابعة أدائك الأكاديمي أولاً بأول.
+            </p>
+            <div class="d-flex gap-3">
+                {% if user.is_authenticated %}
+                    <!-- زِر احترافي وواضح يوجه الطالب للكورسات مباشرة -->
+                    <a href="{% url 'courses:course_list' %}" class="btn btn-primary btn-lg px-4 rounded-3 fw-bold">
+                        <i class="fa-solid fa-book me-2"></i> استكشف الكورسات
+                    </a>
+                {% else %}
+                    <a href="{% url 'accounts:login' %}" class="btn btn-primary btn-lg px-4 rounded-3 fw-bold">
+                        Log In
+                    </a>
+                    <a href="{% url 'accounts:register' %}" class="btn btn-outline-secondary btn-lg px-4 rounded-3">
+                        Sign up 
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-lg-6 text-center mt-5 mt-lg-0">
+            <div class="p-5 bg-light rounded-4 border shadow-sm">
+                <i class="fa-solid fa-graduation-cap display-1 text-primary mb-3"></i>
+                <h3 class="fw-bold text-dark">تعلم بذكاء، وليس بجهد مضاعف</h3>
+                <p class="text-muted small">حل الكويزات واترك الـ AI Agent يحدد نقاط ضعفك ويصمم لك خطتك القادمة.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
