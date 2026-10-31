@@ -44,7 +44,7 @@ def run_study_mate_agent(user, user_message):
     tools = [get_agent_tools_declaration()]
     
     response = client.models.generate_content(
-        model="gemini-3.6-flash",
+        model="gemini-3.5-flash",
         contents=user_message,
         config=types.GenerateContentConfig(
             system_instruction=system_instruction,
